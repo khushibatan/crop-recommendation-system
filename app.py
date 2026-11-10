@@ -22,6 +22,20 @@ saved_model = joblib.load("crop_model.pkl")
 
 model = saved_model["model"]
 features = saved_model["features"]
+
+# Value range the model was trained on. Inputs outside it are extrapolation,
+# so the app warns the user instead of silently showing a confident answer.
+TRAIN_RANGES = pd.read_csv("Crop_recommendation.csv", usecols=features).agg(["min", "max"])
+
+
+def out_of_range_inputs(values):
+    """Return a list of (feature, value, min, max) the model has not seen."""
+    flagged = []
+    for name, value in zip(features, values):
+        low, high = TRAIN_RANGES.loc["min", name], TRAIN_RANGES.loc["max", name]
+        if value < low or value > high:
+            flagged.append((name, value, low, high))
+    return flagged
 # ----------------------------
 # CROP PREDICTION FUNCTION
 # ----------------------------
@@ -174,7 +188,7 @@ with st.form("farm_details_form"):
         )
 
         rainfall = st.number_input(
-            "Rainfall (mm)", min_value=20.21, max_value=298.56, value=202.94
+            "Rainfall (mm)", min_value=0.0, max_value=3000.0, value=202.94
         )
 
     submitted = st.form_submit_button("Get Crop Recommendations")
@@ -191,6 +205,17 @@ if submitted:
     )
 
     st.success("Crop recommendations generated successfully!")
+
+    flagged = out_of_range_inputs([n, p, k, temperature, humidity, ph, rainfall])
+    if flagged:
+        details = "; ".join(
+            f"{name} = {value:g} (model data covers {low:g} to {high:g})"
+            for name, value, low, high in flagged
+        )
+        st.warning(
+            "Some inputs are outside the range this model was trained on, "
+            "so the recommendation is less reliable: " + details
+        )
 
     st.subheader("🌾 Top 3 Recommended Crops")
 

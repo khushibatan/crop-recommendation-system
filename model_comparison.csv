@@ -1,0 +1,4 @@
+model,holdout_accuracy_pct,cv_accuracy_pct
+Decision Tree,97.95,98.77
+Random Forest,99.55,99.55
+K-Nearest Neighbors,97.95,97.14
