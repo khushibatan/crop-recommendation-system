@@ -1,0 +1,19 @@
+[theme]
+base = "light"
+primaryColor = "#2E5D4B"
+backgroundColor = "#F7F6F2"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#1C2321"
+font = "Segoe UI, Helvetica Neue, Arial, sans-serif"
+baseFontSize = 16
+baseFontWeight = 400
+baseRadius = "10px"
+buttonRadius = "8px"
+borderColor = "#E2DFD6"
+showWidgetBorder = true
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false

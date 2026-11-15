@@ -30,8 +30,10 @@ models = {
     "Decision Tree": DecisionTreeClassifier(random_state=42),
 
     "Random Forest": RandomForestClassifier(
-        n_estimators=100,
-        random_state=42
+        n_estimators=200,
+        min_samples_leaf=10,
+        random_state=42,
+        n_jobs=-1
     ),
 
     "K-Nearest Neighbors": make_pipeline(
@@ -75,6 +77,10 @@ print(results_df.to_string(index=False))
 # 7. Save the model that scored best in cross-validation
 best_name = results_df.loc[results_df["cv_accuracy_pct"].idxmax(), "model"]
 best_model = models[best_name]
+
+# The evaluation above used the 80% training split. Refit the chosen model on
+# all labelled rows before saving so the app uses every available example.
+best_model.fit(X, y)
 
 joblib.dump(
     {
